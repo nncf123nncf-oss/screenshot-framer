@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>スクショ整え</title>
+<meta name="description" content="スクリーンショットを選ぶと、余白・背景・角丸・影を付けた画像になり、PNGで保存できます。画像はこの端末の中だけで処理し、保存もしません。">
+<style>
+  :root {
+    --bg: #f3f5f5; --surface: #ffffff; --ink: #1b1f1f; --ink2: #3c4444; --ink3: #596262;
+    --line: #d2d8d8; --line-strong: #778181; --accent: #1A6B6E; --accent-ink: #ffffff; --accent-soft: #e1f0f0;
+    --warn-bg: #fff4d6; --warn-line: #c99a2e; --warn-ink: #5a3d00;
+    --danger: #a8231b; --ok: #1b6b34;
+    --font: "Hiragino Sans","Yu Gothic","BIZ UDPGothic","Noto Sans JP",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121515; --surface: #1b2020; --ink: #edf1f1; --ink2: #c5cdcd; --ink3: #a0aaaa;
+      --line: #343c3c; --line-strong: #7f8b8b; --accent: #86D0D2; --accent-ink: #0b2526; --accent-soft: #1f3536;
+      --warn-bg: #3a2f10; --warn-line: #8a6d2a; --warn-ink: #ffe0a0;
+      --danger: #ff9a92; --ok: #7fd49a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.6; }
+  main { max-width: 1040px; margin: 0 auto; padding: 16px 16px 32px; }
+  h1 { font-size: 22px; line-height: 1.3; margin: 8px 0 8px; }
+  h2 { font-size: 17px; line-height: 1.4; margin: 0 0 8px; }
+  h3 { font-size: 16px; line-height: 1.4; margin: 0 0 6px; }
+  p { margin: 0 0 8px; }
+  a { color: var(--accent); }
+  .lead { color: var(--ink2); }
+  .hint { font-size: 14px; color: var(--ink3); margin: 6px 0 0; }
+  .notes { list-style: none; margin: 12px 0 16px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; font-size: 15px; }
+  .notes li { margin: 0 0 6px; padding-left: 1.5em; text-indent: -1.5em; }
+  .notes li:last-child { margin-bottom: 0; }
+  .notes li::before { content: attr(data-n); display: inline-block; width: 1.5em; text-indent: 0; font-weight: 700; color: var(--accent); }
+  .notes a { display: inline-block; padding: 8px 0; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin: 0 0 14px; }
+  .vh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .drop { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 120px; padding: 14px 16px; border-radius: 8px; border: 2px dashed var(--accent); background: var(--accent-soft); color: var(--ink); text-align: center; cursor: pointer; }
+  .drop:focus-within { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .drop.over { background: var(--accent); color: var(--accent-ink); }
+  .drop .t { font-size: 20px; font-weight: 700; }
+  .drop .s { font-size: 14px; color: inherit; opacity: .9; }
+  button { font: inherit; font-size: 16px; min-height: 44px; padding: 8px 14px; border-radius: 6px; cursor: pointer; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; min-height: 48px; width: 100%; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+  .msg { font-size: 15px; margin: 0 0 12px; }
+  .msg:empty { display: none; }
+  .msg.ok { color: var(--ok); font-weight: 600; }
+  .msg.err { color: var(--danger); font-weight: 600; }
+  .msg.info { color: var(--ink2); }
+
+  .src { display: flex; gap: 12px; align-items: flex-start; }
+  .src canvas { flex: 0 0 auto; max-width: 96px; height: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
+  .src .meta { min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+  .src .meta p { margin: 0 0 4px; }
+  .src .big { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .grp { margin: 0 0 14px; }
+  .grp:last-child { margin-bottom: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 6px 12px; border-radius: 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); font-size: 16px; }
+  .chip .ck { display: inline-block; width: 1em; text-align: center; font-weight: 700; visibility: hidden; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .chip[aria-pressed="true"] .ck { visibility: visible; color: var(--accent); }
+  .sw { display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; border-radius: 50%; border: 1px solid #778181; }
+
+  .result canvas { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; }
+  .empty { color: var(--ink3); font-size: 15px; margin: 0; }
+  .info { font-size: 14px; color: var(--ink2); margin: 8px 0 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); border-radius: 6px; padding: 8px 10px; font-size: 14px; margin: 8px 0 0; }
+  .actions { margin: 12px 0 0; }
+  .longpress { margin-top: 10px; }
+  .longpress img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; margin-top: 6px; }
+
+  .mw-footer { box-sizing: border-box; width: 100%; max-width: 100%; margin: 24px 0 0; padding: 16px; background: #F7F7F8;
+    border: 1px solid #D8D8DC; border-radius: 6px; color: #3A3A3E; font-family: system-ui, sans-serif; font-size: 12px; line-height: 1.7; }
+  .mw-footer p { margin: 0 0 6px; } .mw-footer p:last-child { margin-bottom: 0; } .mw-footer a { color: #0B5AA6; display: inline-block; padding: 13px 0; }
+
+  @media (min-width: 880px) {
+    main { padding: 24px 16px 40px; }
+    h1 { font-size: 24px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+    .col-out { position: sticky; top: 16px; }
+    .src canvas { max-width: 120px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>スクショ整え</h1>
+  <p class="lead">スクリーンショットを選ぶと、余白・背景・角丸・影を付けた画像になります。加工前と加工後を見比べながら、PNGで保存できます。</p>
+
+  <ul class="notes">
+    <li data-n="①">画像はこの端末から外に出ず、保存もしません（通信は閲覧数の計測のみ）。</li>
+    <li data-n="②">画像の中の名前・メールアドレス・通知などは、このページでは隠せません。隠すときは、先に <a href="https://nncf123nncf-oss.github.io/koko-desu-marker/" rel="noopener">ここです（Day046）</a> のモザイクで隠してから選んでください。</li>
+    <li data-n="③">出力はPNGです。元の画像より大きいファイルになることがあります。</li>
+  </ul>
+
+  <div class="layout">
+    <div class="col-in">
+      <section class="panel" aria-label="画像を選ぶ">
+        <label class="drop" id="drop">
+          <input id="file" class="vh" type="file">
+          <span class="t">画像を選ぶ</span>
+          <span class="s">PNG・JPEG・WebP（20MBまで・1枚）。ここに画像を落とす、またはPCでは貼り付け（Ctrl+V）もできます。</span>
+        </label>
+        <div class="btnrow"><button type="button" id="sampleBtn">サンプルで試す</button></div>
+        <p class="hint">サンプルは、このページで描いた架空のアプリ画面です。実在の店や人のものではありません。</p>
+      </section>
+
+      <div id="status" class="msg" role="status" aria-live="polite"></div>
+
+      <section class="panel" id="srcSec" aria-label="元の画像" hidden>
+        <h2>元の画像</h2>
+        <div class="src">
+          <canvas id="thumb" width="1" height="1" role="img" aria-label="元の画像の縮小表示"></canvas>
+          <div class="meta">
+            <p class="big" id="srcDims"></p>
+            <p id="srcName"></p>
+            <p class="hint" id="srcNote" hidden></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="opts" aria-label="整える" hidden>
+        <h2>整える</h2>
+        <div class="grp"><h3>比率</h3><div class="chips" id="g-ratio"></div></div>
+        <div class="grp"><h3>余白</h3><div class="chips" id="g-pad"></div></div>
+        <div class="grp"><h3>背景</h3><div class="chips" id="g-bg"></div></div>
+        <div class="grp"><h3>角丸</h3><div class="chips" id="g-radius"></div></div>
+        <div class="grp"><h3>影</h3><div class="chips" id="g-shadow"></div></div>
+      </section>
+    </div>
+
+    <div class="col-out">
+      <section class="panel result" aria-label="結果">
+        <h2>結果</h2>
+        <p class="empty" id="empty">画像を選ぶと、ここに整えた画像が出ます。</p>
+        <div id="resBox" hidden>
+          <canvas id="out" width="1080" height="1080" role="img" aria-label="整えた画像のプレビュー"></canvas>
+          <p class="info" id="outInfo"></p>
+          <p class="warn" id="blurWarn" hidden>元の画像が小さいため、ぼやけることがあります。</p>
+          <div class="actions">
+            <button type="button" id="saveBtn" class="primary">PNGで保存</button>
+            <div class="btnrow"><button type="button" id="viewBtn">画像を表示して保存</button></div>
+            <p class="hint" id="saveMsg" role="status" aria-live="polite"></p>
+            <p class="hint" id="iosHint" hidden>iPhone・iPadでは「PNGで保存」を押すと共有メニューが開きます。メニューの名前は端末で違いますが、「画像を保存」や「ファイルに保存」を選んでください。開かないときは「画像を表示」して長押しします。</p>
+            <div class="longpress" id="lp"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="mw-footer">
+    <p>みちAIワークス（MICHI AI WORKS）／代表 田中　泉</p>
+    <p>運営: <a href="https://michi-portfolio.vercel.app/" rel="noopener">みちAIワークス 公式サイト</a>（https://michi-portfolio.vercel.app/ ）／ お問い合わせ: <a href="mailto:nncf123nncf@gmail.com">nncf123nncf@gmail.com</a></p>
+    <p>選んだ画像はこのページの中（お使いの端末のブラウザ）だけで処理し、サーバーには送信せず、保存もしません。ページを閉じると消えます。アクセス解析（Cloudflare Web Analytics）で、ページの閲覧状況（閲覧数・参照元・ブラウザの種類など）を計測しています。画像や、その中の情報は送信しません。</p>
+    <p>画像の中に写っている名前・メールアドレス・通知などは、このページでは隠せません。載せてよい内容かどうかは、ご自身で確認してください。</p>
+    <p>ログイン・会員登録・パスワードの入力を求めることはありません。</p>
+  </footer>
+</main>
+
+<script id="core">
+/* 計算と判定の部分（画面を使わない）。source/run-checks.js がここだけを取り出して検算する */
+var SF = (function () {
+  'use strict';
+  var MAX_SIDE = 4096, ORIG_LONG = 1600, MAX_UP = 2.0, MAX_BYTES = 20 * 1024 * 1024;
+  var RATIOS = [
+    { id: '1:1', label: '1:1', dim: '1080×1080', w: 1080, h: 1080 },
+    { id: '4:5', label: '4:5', dim: '1080×1350', w: 1080, h: 1350 },
+    { id: '16:9', label: '16:9', dim: '1920×1080', w: 1920, h: 1080 },
+    { id: 'orig', label: '元の比率', dim: '', w: 0, h: 0 }
+  ];
+  var PADS = [{ id: 's', label: '小（4%）', rate: 0.04 }, { id: 'm', label: '中（8%）', rate: 0.08 }, { id: 'l', label: '大（12%）', rate: 0.12 }];
+  var RADII = [{ id: 'none', label: 'なし', rate: 0 }, { id: 's', label: '小（1.5%）', rate: 0.015 }, { id: 'l', label: '大（4%）', rate: 0.04 }];
+  var SHADOWS = [{ id: 'off', label: 'なし' }, { id: 'on', label: 'あり' }];
+  var BGS = [
+    { id: 'white', label: '白', c: ['#FFFFFF'] },
+    { id: 'lgray', label: '薄灰', c: ['#F2F2F2'] },
+    { id: 'dgray', label: '濃灰', c: ['#2A2A2A'] },
+    { id: 'black', label: '黒', c: ['#111111'] },
+    { id: 'kinari', label: '生成り', c: ['#F5EFE6'] },
+    { id: 'bluegray', label: '薄い青灰', c: ['#E8EEF5'] },
+    { id: 'asayake', label: '朝焼け', c: ['#FFD9A8', '#F08A9C'] },
+    { id: 'umi', label: '海', c: ['#9FD8E8', '#2F6FA8'] },
+    { id: 'mori', label: '森', c: ['#BFE3C4', '#2F7A5B'] },
+    { id: 'sumi', label: '墨', c: ['#5A5F68', '#16181C'] }
+  ];
+  var DEFAULTS = { ratio: '1:1', pad: 'm', bg: 'lgray', radius: 's', shadow: 'on' };
+
+  function find(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return list[0]; }
+
+  /* 配置の計算。iw/ih は読み込み後（4096以内）の画像の寸法 */
+  function layout(iw, ih, o) {
+    var ratio = find(RATIOS, o.ratio), rate = find(PADS, o.pad).rate, rrate = find(RADII, o.radius).rate;
+    var W, H, p, dw, dh, x, y, s, up = false, clamped = false, i;
+    if (ratio.id === 'orig') {
+      var k = Math.max(iw, ih) > ORIG_LONG ? ORIG_LONG / Math.max(iw, ih) : 1;
+      dw = Math.max(1, Math.round(iw * k)); dh = Math.max(1, Math.round(ih * k));
+      // 出力＝画像＋余白×2、余白＝出力の短辺×率 を満たす p（W=dw+2p, H=dh+2p, p=min(W,H)*rate を解く）
+      p = Math.round(Math.min(dw, dh) * rate / (1 - 2 * rate));
+      W = dw + 2 * p; H = dh + 2 * p; s = dw / iw; x = p; y = p;
+    } else {
+      W = ratio.w; H = ratio.h;
+      p = Math.round(Math.min(W, H) * rate);
+      var aw = W - 2 * p, ah = H - 2 * p;
+      s = Math.min(aw / iw, ah / ih);
+      if (s > MAX_UP) { s = MAX_UP; clamped = true; }
+      dw = Math.max(1, Math.round(iw * s)); dh = Math.max(1, Math.round(ih * s));
+      // 左右・上下の余白を1pxの違いもなく揃えるため、(W-dw)と(H-dh)が奇数のときは1px小さくする
+      if ((W - dw) % 2 !== 0 && dw > 1) dw -= 1;
+      if ((H - dh) % 2 !== 0 && dh > 1) dh -= 1;
+      x = (W - dw) / 2; y = (H - dh) / 2;
+      s = dw / iw;
+    }
+    up = s > 1.0000001;
+    var short = Math.min(W, H);
+    var r = Math.round(short * rrate); r = Math.min(r, Math.floor(Math.min(dw, dh) / 2));
+    return { W: W, H: H, p: p, x: x, y: y, dw: dw, dh: dh, s: s, up: up, clamped: clamped, r: r, blur: Math.round(short * 0.04), offY: Math.round(short * 0.01), shadow: o.shadow === 'on' };
+  }
+
+  function rr(ctx, x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+  }
+
+  /* 縮小は半分ずつ段階的に行う（一気に縮めると、ブラウザによっては文字がギザギザになる） */
+  function scaleTo(src, sw, sh, tw, th, mk) {
+    var cur = src, cw = sw, ch = sh, c, g;
+    while (cw / 2 >= tw && ch / 2 >= th && (cw > tw || ch > th)) {
+      var nw = Math.max(tw, Math.floor(cw / 2)), nh = Math.max(th, Math.floor(ch / 2));
+      c = mk(nw, nh); g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh); cur = c; cw = nw; ch = nh;
+    }
+    c = mk(tw, th); g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.drawImage(cur, 0, 0, cw, ch, 0, 0, tw, th);
+    return c;
+  }
+
+  /* 描画。背景→（角丸にした画像＋影）の順。出力の色は選択肢の固定値だけで決まる（ページのライト/ダークに依存しない） */
+  function draw(canvas, src, iw, ih, o, mk) {
+    var L = layout(iw, ih, o), bg = find(BGS, o.bg), g;
+    canvas.width = L.W; canvas.height = L.H; g = canvas.getContext('2d');
+    g.clearRect(0, 0, L.W, L.H);
+    if (bg.c.length === 1) { g.fillStyle = bg.c[0]; g.fillRect(0, 0, L.W, L.H); }
+    else { var gr = g.createLinearGradient(0, 0, L.W, L.H); gr.addColorStop(0, bg.c[0]); gr.addColorStop(1, bg.c[1]); g.fillStyle = gr; g.fillRect(0, 0, L.W, L.H); }
+    // 画像側を先に角丸にした1枚（card）にして、影はその形に落とす（透明なPNGでも、透明部分が黒くならない）
+    var card = (L.dw === iw && L.dh === ih) ? (function () { var c = mk(iw, ih), cg = c.getContext('2d'); cg.drawImage(src, 0, 0); return c; })() : scaleTo(src, iw, ih, L.dw, L.dh, mk);
+    if (L.r > 0) { var cg2 = card.getContext('2d'); cg2.globalCompositeOperation = 'destination-in'; rr(cg2, 0, 0, L.dw, L.dh, L.r); cg2.fillStyle = '#000'; cg2.fill(); cg2.globalCompositeOperation = 'source-over'; }
+    if (L.shadow) { g.save(); g.shadowColor = 'rgba(0,0,0,0.28)'; g.shadowBlur = L.blur; g.shadowOffsetX = 0; g.shadowOffsetY = L.offY; g.drawImage(card, L.x, L.y); g.restore(); }
+    else g.drawImage(card, L.x, L.y);
+    return L;
+  }
+
+  /* ファイルの先頭バイトで種類を判定する */
+  function ascii(b, at, s) { for (var i = 0; i < s.length; i++) if (b[at + i] !== s.charCodeAt(i)) return false; return true; }
+  function sniff(b) {
+    if (!b || b.length < 4) return 'unknown';
+    if (b.length >= 8 && b[0] === 0x89 && ascii(b, 1, 'PNG')) return 'png';
+    if (b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return 'jpeg';
+    if (b.length >= 12 && ascii(b, 0, 'RIFF') && ascii(b, 8, 'WEBP')) return 'webp';
+    if (ascii(b, 0, 'GIF8')) return 'gif';
+    if (b.length >= 14 && b[0] === 0x42 && b[1] === 0x4D && b[6] === 0 && b[7] === 0 && b[8] === 0 && b[9] === 0) return 'bmp';
+    if ((b[0] === 0x49 && b[1] === 0x49 && b[2] === 0x2A && b[3] === 0) || (b[0] === 0x4D && b[1] === 0x4D && b[2] === 0 && b[3] === 0x2A)) return 'tiff';
+    if (b.length >= 12 && ascii(b, 4, 'ftyp')) {
+      var brand = String.fromCharCode(b[8], b[9], b[10], b[11]);
+      if (/^(heic|heix|hevc|heim|heis|hevm|hevs|mif1|msf1)$/.test(brand)) return 'heic';
+      if (/^(avif|avis)$/.test(brand)) return 'avif';
+      return 'video';
+    }
+    if (ascii(b, 0, '%PDF')) return 'pdf';
+    var i0 = (b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF) ? 3 : 0, head = '', i;
+    for (i = i0; i < Math.min(b.length, i0 + 16); i++) head += String.fromCharCode(b[i]);
+    if (/^\s*(<svg|<\?xml)/i.test(head)) return 'svg';
+    for (i = 0; i < b.length; i++) if (b[i] === 0) return 'unknown';
+    return 'text';
+  }
+  var READABLE = { png: 1, jpeg: 1, webp: 1 };
+  var FORMAT_LABEL = { png: 'PNG', jpeg: 'JPEG', webp: 'WebP', gif: 'GIF', bmp: 'BMP', tiff: 'TIFF', heic: 'HEIC', avif: 'AVIF', svg: 'SVG' };
+  /* 'ok' / 'notimage' / 'unsupported' */
+  function classify(kind) { if (READABLE[kind]) return 'ok'; if (FORMAT_LABEL[kind]) return 'unsupported'; return 'notimage'; }
+
+  /* 端末ごとの保存経路（Day060と同じ）。iPadOS は MacIntel を名乗るためタッチ点数で見分ける */
+  function isIOS(ua, platform, touchPoints) {
+    return /iPhone|iPad|iPod/.test(ua || '') || (platform === 'MacIntel' && (touchPoints || 0) > 1);
+  }
+  function saveRoute(ua, platform, touchPoints) { return isIOS(ua, platform, touchPoints) ? 'share' : 'download'; }
+
+  function fileName(ratio, d) {
+    function z(n) { return (n < 10 ? '0' : '') + n; }
+    var r = ratio === 'orig' ? 'orig' : String(ratio).replace(':', 'x');
+    return 'framed-' + r + '-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()) + z(d.getSeconds()) + '.png';
+  }
+
+  return { MAX_SIDE: MAX_SIDE, MAX_BYTES: MAX_BYTES, MAX_UP: MAX_UP, RATIOS: RATIOS, PADS: PADS, RADII: RADII, SHADOWS: SHADOWS, BGS: BGS, DEFAULTS: DEFAULTS,
+    layout: layout, draw: draw, scaleTo: scaleTo, sniff: sniff, classify: classify, FORMAT_LABEL: FORMAT_LABEL, isIOS: isIOS, saveRoute: saveRoute, fileName: fileName };
+})();
+</script>
+
+<script id="ui">
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function mk(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  var FONT = '"Hiragino Sans","Yu Gothic","BIZ UDPGothic","Noto Sans JP",system-ui,sans-serif';
+
+  var nav = window.navigator || {};
+  var ua = nav.userAgent || '', plat = nav.platform || '', touch = nav.maxTouchPoints || 0;
+  var ios = SF.isIOS(ua, plat, touch), route = SF.saveRoute(ua, plat, touch);
+  if (ios) { $('iosHint').hidden = false; $('viewBtn').textContent = '画像を表示（長押しで保存）'; }
+
+  var opt = { ratio: SF.DEFAULTS.ratio, pad: SF.DEFAULTS.pad, bg: SF.DEFAULTS.bg, radius: SF.DEFAULTS.radius, shadow: SF.DEFAULTS.shadow };
+  var state = null;      // { src, w, h } 読み込み済みの画像（4096px以内）
+  var gen = 0;           // 読み込みの世代。選び直したときに、古い読み込みの結果を捨てる
+  var saving = false, lpUrl = null;
+
+  /* ---- 選択肢のチップ ---- */
+  function buildGroup(boxId, key, items, withSwatch) {
+    var box = $(boxId);
+    items.forEach(function (it) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.setAttribute('data-key', key); b.setAttribute('data-id', it.id);
+      var ck = document.createElement('span'); ck.className = 'ck'; ck.setAttribute('aria-hidden', 'true'); ck.textContent = '✓'; b.appendChild(ck);
+      if (withSwatch) {
+        var sw = document.createElement('span'); sw.className = 'sw'; sw.setAttribute('aria-hidden', 'true');
+        sw.style.background = it.c.length === 1 ? it.c[0] : 'linear-gradient(135deg,' + it.c[0] + ',' + it.c[1] + ')';
+        b.appendChild(sw);
+      }
+      var t = document.createElement('span'); t.textContent = it.dim ? it.label + '　' + it.dim : it.label; b.appendChild(t);
+      b.addEventListener('click', function () { opt[key] = it.id; syncChips(); render(); });
+      box.appendChild(b);
+    });
+  }
+  function syncChips() {
+    var all = document.querySelectorAll('.chip');
+    for (var i = 0; i < all.length; i++) all[i].setAttribute('aria-pressed', opt[all[i].getAttribute('data-key')] === all[i].getAttribute('data-id') ? 'true' : 'false');
+  }
+  buildGroup('g-ratio', 'ratio', SF.RATIOS, false);
+  buildGroup('g-pad', 'pad', SF.PADS, false);
+  buildGroup('g-bg', 'bg', SF.BGS, true);
+  buildGroup('g-radius', 'radius', SF.RADII, false);
+  buildGroup('g-shadow', 'shadow', SF.SHADOWS, false);
+  syncChips();
+
+  /* ---- 表示 ---- */
+  function setStatus(text, kind) { var s = $('status'); s.className = 'msg' + (kind ? ' ' + kind : ''); s.textContent = text; }
+  function clearLoaded() {
+    state = null; $('srcSec').hidden = true; $('opts').hidden = true; $('resBox').hidden = true; $('empty').hidden = false;
+    $('blurWarn').hidden = true; $('srcNote').hidden = true; $('saveMsg').textContent = ''; clearLp();
+  }
+  function clearLp() { var box = $('lp'); while (box.firstChild) box.removeChild(box.firstChild); if (lpUrl) { try { URL.revokeObjectURL(lpUrl); } catch (e) { } lpUrl = null; } }
+
+  function render() {
+    if (!state) return;
+    var L = SF.draw($('out'), state.src, state.w, state.h, opt, mk);
+    var pct = Math.round(L.s * 100);
+    var how = pct === 100 ? '元と同じ大きさ' : (L.s > 1 ? '元の' + pct + '%に拡大' : '元の' + pct + '%に縮小');
+    $('outInfo').textContent = '出力 ' + L.W + '×' + L.H + ' px（PNG）／ 余白 ' + L.p + ' px ／ 画像は' + how + (L.clamped ? '（拡大は' + SF.MAX_UP + '倍まで）' : '');
+    $('blurWarn').hidden = !L.up;
+    $('saveMsg').textContent = ''; clearLp();
+  }
+
+  function showLoaded(info) {
+    $('srcDims').textContent = info.origW + '×' + info.origH + ' px（' + info.fmt + '）';
+    $('srcName').textContent = info.name;
+    var th = $('thumb'), tw = 240, k = Math.min(1, tw / Math.max(state.w, state.h));
+    var tdw = Math.max(1, Math.round(state.w * k)), tdh = Math.max(1, Math.round(state.h * k));
+    var sc = SF.scaleTo(state.src, state.w, state.h, tdw, tdh, mk);
+    th.width = tdw; th.height = tdh; th.getContext('2d').drawImage(sc, 0, 0);
+    var note = $('srcNote');
+    if (info.shrunk) { note.textContent = '長辺が' + SF.MAX_SIDE + 'pxを超えていたため、' + SF.MAX_SIDE + 'pxに縮小して扱っています。'; note.hidden = false; } else note.hidden = true;
+    $('srcSec').hidden = false; $('opts').hidden = false; $('resBox').hidden = false; $('empty').hidden = true;
+    render();
+  }
+
+  /* ---- 読み込み ---- */
+  function readHead(file) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () { resolve(new Uint8Array(fr.result)); };
+      fr.onerror = function () { reject(fr.error || new Error('read')); };
+      fr.readAsArrayBuffer(file.slice(0, 32));
+    });
+  }
+  function decode(file) {
+    // 向きの情報（EXIF）を反映して読む。createImageBitmap が使えない・オプションを受けないブラウザは <img> で読む
+    var viaImg = function () {
+      return new Promise(function (resolve, reject) {
+        var url = URL.createObjectURL(file), im = new Image();
+        im.onload = function () {
+          // 向きを反映した寸法（naturalWidth/Height）で canvas に写して固定し、URL はすぐ解放する
+          var w = im.naturalWidth, h = im.naturalHeight;
+          if (!w || !h) { URL.revokeObjectURL(url); reject(new Error('empty')); return; }
+          try { var c = mk(w, h); c.getContext('2d').drawImage(im, 0, 0); URL.revokeObjectURL(url); resolve({ src: c, w: w, h: h }); }
+          catch (e) { URL.revokeObjectURL(url); reject(e); }
+        };
+        im.onerror = function () { URL.revokeObjectURL(url); reject(new Error('decode')); };
+        im.src = url;
+      });
+    };
+    if (typeof createImageBitmap === 'function') {
+      return createImageBitmap(file, { imageOrientation: 'from-image' }).then(function (bm) { return { src: bm, w: bm.width, h: bm.height }; }, viaImg);
+    }
+    return viaImg();
+  }
+
+  function loadFile(file, extra) {
+    var myGen = ++gen;
+    clearLoaded();
+    if (!file) return;
+    if (file.size > SF.MAX_BYTES) { setStatus('ファイルが大きすぎます（20MBまで）。' + Math.round(file.size / 1048576) + 'MBのファイルは読み込みません。', 'err'); return; }
+    if (file.size === 0) { setStatus('空のファイルです。画像ファイルを選んでください（PNG・JPEG・WebP）。', 'err'); return; }
+    setStatus('読み込み中…', 'info');
+    readHead(file).then(function (head) {
+      var kind = SF.sniff(head), cls = SF.classify(kind);
+      if (cls === 'notimage') { throw { user: '画像ファイルを選んでください（PNG・JPEG・WebP）。' }; }
+      if (cls === 'unsupported') { throw { user: 'この形式（' + SF.FORMAT_LABEL[kind] + '）は読めません。PNG・JPEG・WebPの画像を選んでください。' }; }
+      return decode(file).then(function (d) { return { d: d, kind: kind }; }, function () { throw { user: 'この画像は大きすぎて、または壊れていて、読み込めませんでした。別の画像を選んでください。' }; });
+    }).then(function (r) {
+      if (myGen !== gen) return;
+      var d = r.d, origW = d.w, origH = d.h, shrunk = false, src = d.src, w = d.w, h = d.h;
+      if (Math.max(w, h) > SF.MAX_SIDE) {
+        var k = SF.MAX_SIDE / Math.max(w, h), tw = Math.max(1, Math.round(w * k)), th = Math.max(1, Math.round(h * k));
+        try { src = SF.scaleTo(d.src, w, h, tw, th, mk); w = tw; h = th; shrunk = true; }
+        catch (e) { throw { user: 'この画像は大きすぎて読み込めませんでした。' }; }
+        if (d.src && d.src.close) { try { d.src.close(); } catch (e2) { } }
+      }
+      state = { src: src, w: w, h: h };
+      showLoaded({ origW: origW, origH: origH, fmt: SF.FORMAT_LABEL[r.kind], name: file.name || '（名前なし）', shrunk: shrunk });
+      setStatus('読み込みました。' + (extra || ''), 'ok');
+    }).catch(function (e) {
+      if (myGen !== gen) return;
+      clearLoaded();
+      setStatus(e && e.user ? e.user : 'この画像は大きすぎて読み込めませんでした。', 'err');
+    });
+  }
+
+  function pickFrom(files) {
+    if (!files || !files.length) return;
+    loadFile(files[0], files.length > 1 ? ' 複数のファイルが選ばれたため、最初の1枚だけ読みました。' : '');
+  }
+  $('file').addEventListener('change', function (e) { pickFrom(e.target.files); e.target.value = ''; });
+
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function (e) { pickFrom(e.dataTransfer && e.dataTransfer.files); });
+  // 枠の外に落としても、ブラウザが画像を開いてしまわないようにする
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('drop', function (e) { e.preventDefault(); });
+  document.addEventListener('paste', function (e) {
+    var cd = e.clipboardData; if (!cd) return;
+    var files = cd.files && cd.files.length ? cd.files : null;
+    if (!files && cd.items) { var list = []; for (var i = 0; i < cd.items.length; i++) if (cd.items[i].kind === 'file') { var f = cd.items[i].getAsFile(); if (f) list.push(f); } if (list.length) files = list; }
+    if (!files) return;
+    e.preventDefault(); pickFrom(files);
+  });
+
+  /* ---- サンプル（架空のアプリ画面をコードで描く。1170×2532） ---- */
+  function makeSample() {
+    var c = mk(1170, 2532), g = c.getContext('2d');
+    function txt(s, x, y, size, weight, color, align) { g.font = weight + ' ' + size + 'px ' + FONT; g.fillStyle = color; g.textAlign = align || 'left'; g.textBaseline = 'alphabetic'; g.fillText(s, x, y); }
+    function card(x, y, w, h, r) { g.fillStyle = '#FFFFFF'; g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); g.fill(); }
+    g.fillStyle = '#F3F5F7'; g.fillRect(0, 0, 1170, 2532);
+    g.fillStyle = '#1E3A5F'; g.fillRect(0, 0, 1170, 320);
+    txt('9:41', 60, 92, 40, 600, '#FFFFFF');
+    txt('みなと堂', 60, 205, 72, 700, '#FFFFFF');
+    txt('売上一覧', 60, 272, 38, 400, 'rgba(255,255,255,0.82)');
+    card(60, 360, 1050, 300, 28);
+    txt('今月の売上', 110, 440, 38, 400, '#59606A');
+    txt('¥133,010', 110, 568, 112, 700, '#1B2330');
+    txt('7品目', 1060, 440, 36, 400, '#59606A', 'right');
+    txt('売上の内訳', 60, 750, 44, 700, '#1B2330');
+    var rows = [['ドリップコーヒー豆 200g', '12点', '¥17,760'], ['焼き菓子セット（小）', '8点', '¥12,800'], ['手ぬぐい（藍染め）', '15点', '¥24,750'], ['マグカップ 白', '9点', '¥14,400'], ['ハーブティー 5種', '21点', '¥31,500'], ['ギフト包装', '30点', '¥9,000'], ['トートバッグ', '6点', '¥22,800']];
+    for (var i = 0; i < rows.length; i++) {
+      var y = 790 + i * 210;
+      card(60, y, 1050, 186, 24);
+      txt(rows[i][0], 100, y + 80, 46, 600, '#1B2330');
+      txt(rows[i][1], 100, y + 142, 36, 400, '#59606A');
+      txt(rows[i][2], 1070, y + 112, 54, 700, '#1B2330', 'right');
+    }
+    txt('※架空のサンプル画面です', 585, 2330, 32, 400, '#59606A', 'center');
+    g.fillStyle = '#FFFFFF'; g.fillRect(0, 2380, 1170, 152);
+    g.fillStyle = '#D6DBE1'; g.fillRect(0, 2380, 1170, 2);
+    txt('売上', 195, 2480, 40, 700, '#1E3A5F', 'center'); txt('商品', 585, 2480, 40, 400, '#59606A', 'center'); txt('設定', 975, 2480, 40, 400, '#59606A', 'center');
+    return c;
+  }
+  $('sampleBtn').addEventListener('click', function () {
+    ++gen; clearLoaded();
+    var c = makeSample();
+    state = { src: c, w: c.width, h: c.height };
+    showLoaded({ origW: c.width, origH: c.height, fmt: 'PNG', name: 'サンプル（架空のアプリ画面）', shrunk: false });
+    setStatus('サンプルを読み込みました。', 'ok');
+  });
+
+  /* ---- 保存 ---- */
+  function saveMsg(text) { $('saveMsg').textContent = text; }
+  function showLongPress(why, blob) {
+    clearLp();
+    var box = $('lp');
+    var p = document.createElement('p'); p.className = 'warn';
+    p.textContent = (why ? why + ' ' : '') + (ios ? '下の画像を長押しして、「写真に追加」または「画像を保存」を選んでください。' : '下の画像を右クリック（長押し）して、画像を保存してください。');
+    box.appendChild(p);
+    var im = document.createElement('img'); lpUrl = URL.createObjectURL(blob); im.src = lpUrl; im.alt = '整えた画像（長押しで保存）';
+    box.appendChild(im);
+  }
+  function currentFile() {
+    var url;
+    try { url = $('out').toDataURL('image/png'); } catch (e) { return null; }
+    if (!url || url.length < 64 || url.indexOf('data:image/png') !== 0) return null;
+    var bin = atob(url.slice(url.indexOf(',') + 1)), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    var name = SF.fileName(opt.ratio, new Date()), blob, file = null;
+    blob = new Blob([bytes], { type: 'image/png' });
+    try { file = new File([bytes], name, { type: 'image/png' }); } catch (e2) { }
+    return { name: name, blob: blob, file: file };
+  }
+  function save(viewOnly) {
+    if (!state) return;
+    var f = currentFile();
+    if (!f) { saveMsg('画像を書き出せませんでした。比率か余白を小さくして、もう一度試してください。'); return; }
+    if (viewOnly) { showLongPress('', f.blob); saveMsg('画像を表示しました。' + (ios ? '長押しで保存できます。' : '右クリックで保存できます。')); return; }
+    if (route === 'share') {
+      // 利用者の操作中に同期的に呼ぶ（toBlob など非同期処理をはさまない）
+      if (f.file && nav.share && nav.canShare && nav.canShare({ files: [f.file] })) {
+        if (saving) return; saving = true;
+        nav.share({ files: [f.file] }).then(function () { saving = false; saveMsg('共有メニューを閉じました。保存先を選べていれば保存されています。'); })
+          .catch(function (e) { saving = false; if (e && e.name === 'AbortError') saveMsg('共有メニューを閉じました。保存はされていません。'); else showLongPress('共有メニューを開けませんでした。', f.blob); });
+        return;
+      }
+      showLongPress('この端末では共有メニューを使えません。', f.blob);
+      return;
+    }
+    var a = document.createElement('a');
+    if (!('download' in a)) { showLongPress('このブラウザでは自動の保存ができません。', f.blob); return; }
+    var u = URL.createObjectURL(f.blob);
+    a.href = u; a.download = f.name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { try { URL.revokeObjectURL(u); } catch (e) { } }, 4000);
+    saveMsg('ダウンロードを試しました（' + f.name + '）。保存されないときは「画像を表示して保存」を使ってください（LINEなどアプリ内のブラウザでは保存できないことがあります）。');
+  }
+  $('saveBtn').addEventListener('click', function () { save(false); });
+  $('viewBtn').addEventListener('click', function () { save(true); });
+})();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "b4c9f7e78daf4edb84ef52b88633f649"}'></script>
+</body>
+</html>
