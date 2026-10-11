@@ -18,7 +18,7 @@ fs.mkdirSync(OUT, { recursive: true });
   console.log('card1', JSON.stringify({ lay, h1, res, src, opts }));
   await b.shot(path.join(OUT, '01-desktop-result-' + DATE + '.png'), { x: 0, y: Math.max(0, lay.top - 16), width: 900, height: src.bottom + 8 - (lay.top - 16) });
   await b.shot(path.join(OUT, 'source-desktop-full.png'), { x: 0, y: 0, width: 900, height: await b.ev('document.documentElement.scrollHeight') });
-  // Card2: 375px・DPR2。小さい画像（480x320）を16:9・濃灰・角丸大で整えた状態（拡大は2倍で止まる）。ぼやけの補足と保存ボタンまで。
+  // Card2: 375px・DPR2。小さい画像（480x320）を16:9・濃灰・角丸大で整えた状態（拡大は2倍で止まる）。ぼやけの補足まで（見出しが2行になるため、保存ボタンは画角に入れない）。
   // （4:5にすると結果の画像だけで高さが約400pxになり、補足と保存ボタンまで入れると占有率の下限60%を満たせない。iPhone向けの保存案内も同様に画角へ入れない。16:9にして収める）
   await b.open(PAGE, 375, 900, 2, true);
   await b.pick('#file', path.join(SRC, 'small-480x320.png'));
@@ -26,7 +26,7 @@ fs.mkdirSync(OUT, { recursive: true });
   await b.sleep(300);
   const warn = await rect('#blurWarn'), save = await rect('#saveBtn'), outc = await rect('#out');
   console.log('card2', JSON.stringify({ warn, save, outc }));
-  await b.shot(path.join(OUT, '02-mobile375-result-' + DATE + '.png'), { x: 0, y: outc.top - 8, width: 375, height: save.bottom - outc.top + 18 });
+  await b.shot(path.join(OUT, '02-mobile375-result-' + DATE + '.png'), { x: 0, y: outc.top - 8, width: 375, height: warn.bottom - outc.top + 18 });
   await b.shot(path.join(OUT, 'source-mobile375-full.png'), { x: 0, y: 0, width: 375, height: await b.ev('document.documentElement.scrollHeight') });
   b.close(); setTimeout(() => process.exit(0), 300);
 })().catch(e => { console.error(e); process.exit(2); });
