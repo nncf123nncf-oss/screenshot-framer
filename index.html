@@ -31,7 +31,7 @@
   p { margin: 0 0 8px; }
   a { color: var(--accent); }
   .lead { color: var(--ink2); }
-  .hint { font-size: 15px; color: var(--ink3); margin: 6px 0 0; }
+  .hint { font-size: 16px; color: var(--ink3); margin: 6px 0 0; }
   .notes { list-style: none; margin: 12px 0 16px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; font-size: 16px; }
   .notes li { margin: 0 0 6px; padding-left: 1.5em; text-indent: -1.5em; }
   .notes li:last-child { margin-bottom: 0; }
@@ -104,7 +104,7 @@
 
   <ul class="notes">
     <li data-n="①">画像はこの端末から外に出ず、保存もしません（通信は閲覧数の計測のみ）。</li>
-    <li data-n="②">画像の中の名前・メールアドレス・通知などは、このページでは隠せません。隠す必要があるときは、画像に印やモザイクをつけるページ（<a href="https://nncf123nncf-oss.github.io/koko-desu-marker/" target="_blank" rel="noopener">Day046「ここです」</a>・別のタブで開きます）が使えます。文字が読めなくなっているかは、保存する前にご自身で確かめてください。</li>
+    <li data-n="②">画像の中の名前・メールアドレス・通知などは、このページでは隠せません。隠す必要があるときは、画像に印やモザイクをつけるページが使えます。<br><a href="https://nncf123nncf-oss.github.io/koko-desu-marker/" target="_blank" rel="noopener">Day046「ここです」（別のタブで開きます）</a><br>文字が読めなくなっているかは、保存する前にご自身で確かめてください。</li>
     <li data-n="③">出力はPNGです。元の画像より大きいファイルになることがあります。</li>
   </ul>
 
@@ -136,7 +136,7 @@
 
       <section class="panel" id="opts" aria-label="整える" hidden>
         <h2>整える</h2>
-        <div class="grp"><h3>比率</h3><div class="chips two" id="g-ratio"></div><p class="hint">出力の大きさは、1:1が1080×1080、4:5が1080×1350、16:9が1920×1080です（この道具で決めた大きさです）。「元の比率」は元の画像と同じ比率で、長辺は1600pxまでです。</p></div>
+        <div class="grp"><h3>比率</h3><div class="chips two" id="g-ratio"></div><p class="hint">出力の大きさは、1:1が1080×1080、4:5が1080×1350、16:9が1920×1080です（この道具で決めた大きさです）。「元の比率」は、画像を元の比率のまま（長辺1600pxまで）にして、まわりに余白をつけます。</p></div>
         <div class="grp"><h3>余白</h3><div class="chips" id="g-pad"></div><p class="hint">出力の短辺に対して、小は4%・中は8%・大は12%です。</p></div>
         <div class="grp"><h3>背景</h3><div class="chips" id="g-bg"></div></div>
         <div class="grp"><h3>角丸</h3><div class="chips" id="g-radius"></div><p class="hint">出力の短辺に対して、小は1.5%・大は4%です。</p></div>
