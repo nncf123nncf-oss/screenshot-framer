@@ -50,4 +50,11 @@ with open(p('s9-over20mb.png'), 'wb') as f:
 marked(600, 600).save(p('s11-second-600x600.png'))
 # WebP
 marked(900, 500).save(p('s12-webp-900x500.webp'), quality=90)
+# 寸法だけが巨大（20000x20000）と書かれたPNG。復号せずに止まるはず（IHDRだけ正しく、あとは中身なし）
+import zlib
+def chunk(t, data): return struct.pack('>I', len(data)) + t + data + struct.pack('>I', zlib.crc32(t + data) & 0xffffffff)
+open(p('s13-claim-20000x20000.png'), 'wb').write(b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', 20000, 20000, 8, 2, 0, 0, 0)) + chunk(b'IEND', b''))
+# EXIFが大きくて、寸法(SOF)が先頭から離れたJPEG
+big = Image.Exif(); big[0x010E] = 'x' * 40000
+marked(640, 480).save(p('s14-bigexif-640x480.jpg'), quality=90, exif=big)
 print('ok', len(os.listdir(out)), 'files')

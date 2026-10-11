@@ -31,12 +31,12 @@
   p { margin: 0 0 8px; }
   a { color: var(--accent); }
   .lead { color: var(--ink2); }
-  .hint { font-size: 14px; color: var(--ink3); margin: 6px 0 0; }
-  .notes { list-style: none; margin: 12px 0 16px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; font-size: 15px; }
+  .hint { font-size: 15px; color: var(--ink3); margin: 6px 0 0; }
+  .notes { list-style: none; margin: 12px 0 16px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; font-size: 16px; }
   .notes li { margin: 0 0 6px; padding-left: 1.5em; text-indent: -1.5em; }
   .notes li:last-child { margin-bottom: 0; }
   .notes li::before { content: attr(data-n); display: inline-block; width: 1.5em; text-indent: 0; font-weight: 700; color: var(--accent); }
-  .notes a { display: inline-block; padding: 8px 0; }
+  .notes a { display: inline-block; padding: 10px 0; text-indent: 0; }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin: 0 0 14px; }
   .vh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   [hidden] { display: none !important; }
@@ -46,13 +46,13 @@
   .drop:focus-within { outline: 3px solid var(--accent); outline-offset: 3px; }
   .drop.over { background: var(--accent); color: var(--accent-ink); }
   .drop .t { font-size: 20px; font-weight: 700; }
-  .drop .s { font-size: 14px; color: inherit; opacity: .9; }
+  .drop .s { font-size: 16px; color: inherit; opacity: .9; }
   button { font: inherit; font-size: 16px; min-height: 44px; padding: 8px 14px; border-radius: 6px; cursor: pointer; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }
   button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; min-height: 48px; width: 100%; }
   button:disabled { opacity: .5; cursor: not-allowed; }
   .btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 
-  .msg { font-size: 15px; margin: 0 0 12px; }
+  .msg { font-size: 16px; margin: 0 0 12px; }
   .msg:empty { display: none; }
   .msg.ok { color: var(--ok); font-weight: 600; }
   .msg.err { color: var(--danger); font-weight: 600; }
@@ -60,7 +60,7 @@
 
   .src { display: flex; gap: 12px; align-items: flex-start; }
   .src canvas { flex: 0 0 auto; max-width: 96px; height: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
-  .src .meta { min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+  .src .meta { min-width: 0; font-size: 16px; overflow-wrap: anywhere; }
   .src .meta p { margin: 0 0 4px; }
   .src .big { font-weight: 700; font-variant-numeric: tabular-nums; }
 
@@ -68,16 +68,18 @@
   .grp:last-child { margin-bottom: 0; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 6px 12px; border-radius: 8px; background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); font-size: 16px; }
+  .chips.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .chip .ck { display: inline-block; width: 1em; text-align: center; font-weight: 700; visibility: hidden; }
   .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-soft); font-weight: 700; }
   .chip[aria-pressed="true"] .ck { visibility: visible; color: var(--accent); }
   .sw { display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; border-radius: 50%; border: 1px solid #778181; }
 
   .result canvas { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; }
-  .empty { color: var(--ink3); font-size: 15px; margin: 0; }
-  .info { font-size: 14px; color: var(--ink2); margin: 8px 0 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-  .warn { background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); border-radius: 6px; padding: 8px 10px; font-size: 14px; margin: 8px 0 0; }
+  .empty { color: var(--ink2); font-size: 16px; margin: 0; }
+  .outinfo { font-size: 16px; color: var(--ink2); margin: 8px 0 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); border-radius: 6px; padding: 8px 10px; font-size: 16px; margin: 8px 0 0; }
   .actions { margin: 12px 0 0; }
+  #saveMsg, #iosHint { font-size: 16px; color: var(--ink2); }
   .longpress { margin-top: 10px; }
   .longpress img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; margin-top: 6px; }
 
@@ -91,17 +93,18 @@
     .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
     .col-out { position: sticky; top: 16px; }
     .src canvas { max-width: 120px; }
+    .result canvas { width: auto; max-width: 100%; max-height: calc(100vh - 260px); margin: 0 auto; }
   }
 </style>
 </head>
 <body>
 <main>
   <h1>スクショ整え</h1>
-  <p class="lead">スクリーンショットを選ぶと、余白・背景・角丸・影を付けた画像になります。加工前と加工後を見比べながら、PNGで保存できます。</p>
+  <p class="lead">スクリーンショットを選ぶと、余白・背景・角丸・影を付けた画像になります。元の画像（縮小表示）と見比べながら、PNGで保存できます。</p>
 
   <ul class="notes">
     <li data-n="①">画像はこの端末から外に出ず、保存もしません（通信は閲覧数の計測のみ）。</li>
-    <li data-n="②">画像の中の名前・メールアドレス・通知などは、このページでは隠せません。隠すときは、先に <a href="https://nncf123nncf-oss.github.io/koko-desu-marker/" rel="noopener">ここです（Day046）</a> のモザイクで隠してから選んでください。</li>
+    <li data-n="②">画像の中の名前・メールアドレス・通知などは、このページでは隠せません。隠す必要があるときは、画像に印やモザイクをつけるページ（<a href="https://nncf123nncf-oss.github.io/koko-desu-marker/" target="_blank" rel="noopener">Day046「ここです」</a>・別のタブで開きます）が使えます。文字が読めなくなっているかは、保存する前にご自身で確かめてください。</li>
     <li data-n="③">出力はPNGです。元の画像より大きいファイルになることがあります。</li>
   </ul>
 
@@ -111,7 +114,7 @@
         <label class="drop" id="drop">
           <input id="file" class="vh" type="file">
           <span class="t">画像を選ぶ</span>
-          <span class="s">PNG・JPEG・WebP（20MBまで・1枚）。ここに画像を落とす、またはPCでは貼り付け（Ctrl+V）もできます。</span>
+          <span class="s">PNG・JPEG・WebP（20MBまで・1枚）。ここに画像を落とす、またはPCでは貼り付け（Ctrl+V・Macは⌘V）もできます。</span>
         </label>
         <div class="btnrow"><button type="button" id="sampleBtn">サンプルで試す</button></div>
         <p class="hint">サンプルは、このページで描いた架空のアプリ画面です。実在の店や人のものではありません。</p>
@@ -133,10 +136,10 @@
 
       <section class="panel" id="opts" aria-label="整える" hidden>
         <h2>整える</h2>
-        <div class="grp"><h3>比率</h3><div class="chips" id="g-ratio"></div></div>
-        <div class="grp"><h3>余白</h3><div class="chips" id="g-pad"></div></div>
+        <div class="grp"><h3>比率</h3><div class="chips two" id="g-ratio"></div><p class="hint">出力の大きさは、1:1が1080×1080、4:5が1080×1350、16:9が1920×1080です（この道具で決めた大きさです）。「元の比率」は元の画像と同じ比率で、長辺は1600pxまでです。</p></div>
+        <div class="grp"><h3>余白</h3><div class="chips" id="g-pad"></div><p class="hint">出力の短辺に対して、小は4%・中は8%・大は12%です。</p></div>
         <div class="grp"><h3>背景</h3><div class="chips" id="g-bg"></div></div>
-        <div class="grp"><h3>角丸</h3><div class="chips" id="g-radius"></div></div>
+        <div class="grp"><h3>角丸</h3><div class="chips" id="g-radius"></div><p class="hint">出力の短辺に対して、小は1.5%・大は4%です。</p></div>
         <div class="grp"><h3>影</h3><div class="chips" id="g-shadow"></div></div>
       </section>
     </div>
@@ -147,7 +150,7 @@
         <p class="empty" id="empty">画像を選ぶと、ここに整えた画像が出ます。</p>
         <div id="resBox" hidden>
           <canvas id="out" width="1080" height="1080" role="img" aria-label="整えた画像のプレビュー"></canvas>
-          <p class="info" id="outInfo"></p>
+          <p class="outinfo" id="outInfo"></p>
           <p class="warn" id="blurWarn" hidden>元の画像が小さいため、ぼやけることがあります。</p>
           <div class="actions">
             <button type="button" id="saveBtn" class="primary">PNGで保存</button>
@@ -176,13 +179,13 @@ var SF = (function () {
   'use strict';
   var MAX_SIDE = 4096, ORIG_LONG = 1600, MAX_UP = 2.0, MAX_BYTES = 20 * 1024 * 1024;
   var RATIOS = [
-    { id: '1:1', label: '1:1', dim: '1080×1080', w: 1080, h: 1080 },
-    { id: '4:5', label: '4:5', dim: '1080×1350', w: 1080, h: 1350 },
-    { id: '16:9', label: '16:9', dim: '1920×1080', w: 1920, h: 1080 },
+    { id: '1:1', label: '1:1', w: 1080, h: 1080 },
+    { id: '4:5', label: '4:5', w: 1080, h: 1350 },
+    { id: '16:9', label: '16:9', w: 1920, h: 1080 },
     { id: 'orig', label: '元の比率', dim: '', w: 0, h: 0 }
   ];
-  var PADS = [{ id: 's', label: '小（4%）', rate: 0.04 }, { id: 'm', label: '中（8%）', rate: 0.08 }, { id: 'l', label: '大（12%）', rate: 0.12 }];
-  var RADII = [{ id: 'none', label: 'なし', rate: 0 }, { id: 's', label: '小（1.5%）', rate: 0.015 }, { id: 'l', label: '大（4%）', rate: 0.04 }];
+  var PADS = [{ id: 's', label: '小', rate: 0.04 }, { id: 'm', label: '中', rate: 0.08 }, { id: 'l', label: '大', rate: 0.12 }];
+  var RADII = [{ id: 'none', label: 'なし', rate: 0 }, { id: 's', label: '小', rate: 0.015 }, { id: 'l', label: '大', rate: 0.04 }];
   var SHADOWS = [{ id: 'off', label: 'なし' }, { id: 'on', label: 'あり' }];
   var BGS = [
     { id: 'white', label: '白', c: ['#FFFFFF'] },
@@ -208,7 +211,7 @@ var SF = (function () {
       var k = Math.max(iw, ih) > ORIG_LONG ? ORIG_LONG / Math.max(iw, ih) : 1;
       dw = Math.max(1, Math.round(iw * k)); dh = Math.max(1, Math.round(ih * k));
       // 出力＝画像＋余白×2、余白＝出力の短辺×率 を満たす p（W=dw+2p, H=dh+2p, p=min(W,H)*rate を解く）
-      p = Math.round(Math.min(dw, dh) * rate / (1 - 2 * rate));
+      p = Math.max(1, Math.round(Math.min(dw, dh) * rate / (1 - 2 * rate)));
       W = dw + 2 * p; H = dh + 2 * p; s = dw / iw; x = p; y = p;
     } else {
       W = ratio.w; H = ratio.h;
@@ -218,8 +221,8 @@ var SF = (function () {
       if (s > MAX_UP) { s = MAX_UP; clamped = true; }
       dw = Math.max(1, Math.round(iw * s)); dh = Math.max(1, Math.round(ih * s));
       // 左右・上下の余白を1pxの違いもなく揃えるため、(W-dw)と(H-dh)が奇数のときは1px小さくする
-      if ((W - dw) % 2 !== 0 && dw > 1) dw -= 1;
-      if ((H - dh) % 2 !== 0 && dh > 1) dh -= 1;
+      if ((W - dw) % 2 !== 0) dw += (dw > 1 ? -1 : 1);
+      if ((H - dh) % 2 !== 0) dh += (dh > 1 ? -1 : 1);
       x = (W - dw) / 2; y = (H - dh) / 2;
       s = dw / iw;
     }
@@ -238,14 +241,18 @@ var SF = (function () {
 
   /* 縮小は半分ずつ段階的に行う（一気に縮めると、ブラウザによっては文字がギザギザになる） */
   function scaleTo(src, sw, sh, tw, th, mk) {
-    var cur = src, cw = sw, ch = sh, c, g;
+    var cur = src, cw = sw, ch = sh, c, g, mine = false;
     while (cw / 2 >= tw && ch / 2 >= th && (cw > tw || ch > th)) {
       var nw = Math.max(tw, Math.floor(cw / 2)), nh = Math.max(th, Math.floor(ch / 2));
+      if (nw * nh > 12000000) { nw = tw; nh = th; }   // 途中のcanvasが大きすぎる（iOSは約1677万pxまで）ときは一気に縮める
       c = mk(nw, nh); g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-      g.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh); cur = c; cw = nw; ch = nh;
+      g.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
+      if (mine) { cur.width = 0; cur.height = 0; }
+      cur = c; cw = nw; ch = nh; mine = true;
     }
     c = mk(tw, th); g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
     g.drawImage(cur, 0, 0, cw, ch, 0, 0, tw, th);
+    if (mine) { cur.width = 0; cur.height = 0; }
     return c;
   }
 
@@ -261,6 +268,7 @@ var SF = (function () {
     if (L.r > 0) { var cg2 = card.getContext('2d'); cg2.globalCompositeOperation = 'destination-in'; rr(cg2, 0, 0, L.dw, L.dh, L.r); cg2.fillStyle = '#000'; cg2.fill(); cg2.globalCompositeOperation = 'source-over'; }
     if (L.shadow) { g.save(); g.shadowColor = 'rgba(0,0,0,0.28)'; g.shadowBlur = L.blur; g.shadowOffsetX = 0; g.shadowOffsetY = L.offY; g.drawImage(card, L.x, L.y); g.restore(); }
     else g.drawImage(card, L.x, L.y);
+    card.width = 0; card.height = 0;
     return L;
   }
 
@@ -287,6 +295,31 @@ var SF = (function () {
     for (i = 0; i < b.length; i++) if (b[i] === 0) return 'unknown';
     return 'text';
   }
+  /* 先頭バイトから幅・高さを読む（PNG・WebP・JPEG）。読めなければ null。復号の前に、極端に大きい画像を止めるために使う */
+  function u32(b, i) { return ((b[i] << 24) >>> 0) + (b[i + 1] << 16) + (b[i + 2] << 8) + b[i + 3]; }
+  function imageSize(b, kind) {
+    var i;
+    if (kind === 'png' && b.length >= 24 && ascii(b, 12, 'IHDR')) return { w: u32(b, 16), h: u32(b, 20) };
+    if (kind === 'webp' && b.length >= 30) {
+      if (ascii(b, 12, 'VP8X')) return { w: 1 + (b[24] | (b[25] << 8) | (b[26] << 16)), h: 1 + (b[27] | (b[28] << 8) | (b[29] << 16)) };
+      if (ascii(b, 12, 'VP8L') && b[20] === 0x2F) { var v = (b[21] | (b[22] << 8) | (b[23] << 16) | (b[24] << 24)) >>> 0; return { w: (v & 0x3FFF) + 1, h: ((v >>> 14) & 0x3FFF) + 1 }; }
+      if (ascii(b, 12, 'VP8 ') && b[23] === 0x9D && b[24] === 0x01 && b[25] === 0x2A) return { w: (b[26] | (b[27] << 8)) & 0x3FFF, h: (b[28] | (b[29] << 8)) & 0x3FFF };
+      return null;
+    }
+    if (kind === 'jpeg') {
+      i = 2;
+      while (i + 9 < b.length) {
+        if (b[i] !== 0xFF) { i++; continue; }
+        var m = b[i + 1];
+        if (m === 0xFF) { i++; continue; }
+        if (m === 0xD8 || m === 0x01 || (m >= 0xD0 && m <= 0xD7)) { i += 2; continue; }
+        if ((m >= 0xC0 && m <= 0xCF) && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) return { h: (b[i + 5] << 8) | b[i + 6], w: (b[i + 7] << 8) | b[i + 8] };
+        i += 2 + ((b[i + 2] << 8) | b[i + 3]);
+      }
+    }
+    return null;
+  }
+  var MAX_PIXELS = 100000000;
   var READABLE = { png: 1, jpeg: 1, webp: 1 };
   var FORMAT_LABEL = { png: 'PNG', jpeg: 'JPEG', webp: 'WebP', gif: 'GIF', bmp: 'BMP', tiff: 'TIFF', heic: 'HEIC', avif: 'AVIF', svg: 'SVG' };
   /* 'ok' / 'notimage' / 'unsupported' */
@@ -305,7 +338,7 @@ var SF = (function () {
   }
 
   return { MAX_SIDE: MAX_SIDE, MAX_BYTES: MAX_BYTES, MAX_UP: MAX_UP, RATIOS: RATIOS, PADS: PADS, RADII: RADII, SHADOWS: SHADOWS, BGS: BGS, DEFAULTS: DEFAULTS,
-    layout: layout, draw: draw, scaleTo: scaleTo, sniff: sniff, classify: classify, FORMAT_LABEL: FORMAT_LABEL, isIOS: isIOS, saveRoute: saveRoute, fileName: fileName };
+    layout: layout, draw: draw, scaleTo: scaleTo, sniff: sniff, imageSize: imageSize, MAX_PIXELS: MAX_PIXELS, classify: classify, FORMAT_LABEL: FORMAT_LABEL, isIOS: isIOS, saveRoute: saveRoute, fileName: fileName };
 })();
 </script>
 
@@ -337,7 +370,7 @@ var SF = (function () {
         sw.style.background = it.c.length === 1 ? it.c[0] : 'linear-gradient(135deg,' + it.c[0] + ',' + it.c[1] + ')';
         b.appendChild(sw);
       }
-      var t = document.createElement('span'); t.textContent = it.dim ? it.label + '　' + it.dim : it.label; b.appendChild(t);
+      var t = document.createElement('span'); t.textContent = it.label; b.appendChild(t);
       b.addEventListener('click', function () { opt[key] = it.id; syncChips(); render(); });
       box.appendChild(b);
     });
@@ -356,6 +389,7 @@ var SF = (function () {
   /* ---- 表示 ---- */
   function setStatus(text, kind) { var s = $('status'); s.className = 'msg' + (kind ? ' ' + kind : ''); s.textContent = text; }
   function clearLoaded() {
+    if (state && state.src) { if (state.src.close) { try { state.src.close(); } catch (e) { } } else if (state.src.width) { state.src.width = 0; state.src.height = 0; } }
     state = null; $('srcSec').hidden = true; $('opts').hidden = true; $('resBox').hidden = true; $('empty').hidden = false;
     $('blurWarn').hidden = true; $('srcNote').hidden = true; $('saveMsg').textContent = ''; clearLp();
   }
@@ -363,12 +397,15 @@ var SF = (function () {
 
   function render() {
     if (!state) return;
-    var L = SF.draw($('out'), state.src, state.w, state.h, opt, mk);
-    var pct = Math.round(L.s * 100);
+    var L;
+    try { L = SF.draw($('out'), state.src, state.w, state.h, opt, mk); }
+    catch (e) { $('resBox').hidden = true; $('empty').hidden = false; $('empty').textContent = '画像を描けませんでした。画像を選び直すか、比率・余白を変えてください。'; return; }
+    $('empty').textContent = '画像を選ぶと、ここに整えた画像が出ます。'; $('empty').hidden = true; $('resBox').hidden = false;
+    var pct = Math.round(L.s * (state.w / (state.origW || state.w)) * 100);
     var how = pct === 100 ? '元と同じ大きさ' : (L.s > 1 ? '元の' + pct + '%に拡大' : '元の' + pct + '%に縮小');
     $('outInfo').textContent = '出力 ' + L.W + '×' + L.H + ' px（PNG）／ 余白 ' + L.p + ' px ／ 画像は' + how + (L.clamped ? '（拡大は' + SF.MAX_UP + '倍まで）' : '');
     $('blurWarn').hidden = !L.up;
-    $('saveMsg').textContent = ''; clearLp();
+    $('saveMsg').textContent = ''; clearLp(); schedulePrep();
   }
 
   function showLoaded(info) {
@@ -390,7 +427,7 @@ var SF = (function () {
       var fr = new FileReader();
       fr.onload = function () { resolve(new Uint8Array(fr.result)); };
       fr.onerror = function () { reject(fr.error || new Error('read')); };
-      fr.readAsArrayBuffer(file.slice(0, 32));
+      fr.readAsArrayBuffer(file.slice(0, 262144));
     });
   }
   function decode(file) {
@@ -402,7 +439,11 @@ var SF = (function () {
           // 向きを反映した寸法（naturalWidth/Height）で canvas に写して固定し、URL はすぐ解放する
           var w = im.naturalWidth, h = im.naturalHeight;
           if (!w || !h) { URL.revokeObjectURL(url); reject(new Error('empty')); return; }
-          try { var c = mk(w, h); c.getContext('2d').drawImage(im, 0, 0); URL.revokeObjectURL(url); resolve({ src: c, w: w, h: h }); }
+          try {
+            var k = Math.max(w, h) > SF.MAX_SIDE ? SF.MAX_SIDE / Math.max(w, h) : 1, tw = Math.max(1, Math.round(w * k)), th = Math.max(1, Math.round(h * k));
+            var c = mk(tw, th); c.getContext('2d').drawImage(im, 0, 0, tw, th); URL.revokeObjectURL(url);
+            resolve({ src: c, w: tw, h: th, origW: w, origH: h });
+          }
           catch (e) { URL.revokeObjectURL(url); reject(e); }
         };
         im.onerror = function () { URL.revokeObjectURL(url); reject(new Error('decode')); };
@@ -419,24 +460,26 @@ var SF = (function () {
     var myGen = ++gen;
     clearLoaded();
     if (!file) return;
-    if (file.size > SF.MAX_BYTES) { setStatus('ファイルが大きすぎます（20MBまで）。' + Math.round(file.size / 1048576) + 'MBのファイルは読み込みません。', 'err'); return; }
+    if (file.size > SF.MAX_BYTES) { setStatus('ファイルが大きすぎます（20MBまで）。' + (Math.ceil(file.size / 104857.6) / 10) + 'MBのファイルは読み込みません。', 'err'); return; }
     if (file.size === 0) { setStatus('空のファイルです。画像ファイルを選んでください（PNG・JPEG・WebP）。', 'err'); return; }
     setStatus('読み込み中…', 'info');
     readHead(file).then(function (head) {
-      var kind = SF.sniff(head), cls = SF.classify(kind);
+      var kind = SF.sniff(head.subarray(0, 32)), cls = SF.classify(kind);
       if (cls === 'notimage') { throw { user: '画像ファイルを選んでください（PNG・JPEG・WebP）。' }; }
       if (cls === 'unsupported') { throw { user: 'この形式（' + SF.FORMAT_LABEL[kind] + '）は読めません。PNG・JPEG・WebPの画像を選んでください。' }; }
+      var sz = SF.imageSize(head, kind);
+      if (sz && (sz.w * sz.h > SF.MAX_PIXELS || sz.w > 60000 || sz.h > 60000)) { throw { user: 'この画像は大きすぎて読み込めませんでした（' + sz.w + '×' + sz.h + ' px）。' }; }
       return decode(file).then(function (d) { return { d: d, kind: kind }; }, function () { throw { user: 'この画像は大きすぎて、または壊れていて、読み込めませんでした。別の画像を選んでください。' }; });
     }).then(function (r) {
-      if (myGen !== gen) return;
-      var d = r.d, origW = d.w, origH = d.h, shrunk = false, src = d.src, w = d.w, h = d.h;
+      if (myGen !== gen) { if (r && r.d && r.d.src && r.d.src.close) { try { r.d.src.close(); } catch (e0) { } } return; }
+      var d = r.d, origW = d.origW || d.w, origH = d.origH || d.h, shrunk = !!d.origW && (d.origW !== d.w || d.origH !== d.h), src = d.src, w = d.w, h = d.h;
       if (Math.max(w, h) > SF.MAX_SIDE) {
         var k = SF.MAX_SIDE / Math.max(w, h), tw = Math.max(1, Math.round(w * k)), th = Math.max(1, Math.round(h * k));
         try { src = SF.scaleTo(d.src, w, h, tw, th, mk); w = tw; h = th; shrunk = true; }
         catch (e) { throw { user: 'この画像は大きすぎて読み込めませんでした。' }; }
         if (d.src && d.src.close) { try { d.src.close(); } catch (e2) { } }
       }
-      state = { src: src, w: w, h: h };
+      state = { src: src, w: w, h: h, origW: origW };
       showLoaded({ origW: origW, origH: origH, fmt: SF.FORMAT_LABEL[r.kind], name: file.name || '（名前なし）', shrunk: shrunk });
       setStatus('読み込みました。' + (extra || ''), 'ok');
     }).catch(function (e) {
@@ -454,7 +497,8 @@ var SF = (function () {
 
   var drop = $('drop');
   ['dragenter', 'dragover'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.add('over'); }); });
-  ['dragleave', 'drop'].forEach(function (n) { drop.addEventListener(n, function (e) { e.preventDefault(); drop.classList.remove('over'); }); });
+  drop.addEventListener('dragleave', function (e) { e.preventDefault(); if (!e.relatedTarget || !drop.contains(e.relatedTarget)) drop.classList.remove('over'); });
+  drop.addEventListener('drop', function (e) { e.preventDefault(); drop.classList.remove('over'); });
   drop.addEventListener('drop', function (e) { pickFrom(e.dataTransfer && e.dataTransfer.files); });
   // 枠の外に落としても、ブラウザが画像を開いてしまわないようにする
   window.addEventListener('dragover', function (e) { e.preventDefault(); });
@@ -515,6 +559,12 @@ var SF = (function () {
     var im = document.createElement('img'); lpUrl = URL.createObjectURL(blob); im.src = lpUrl; im.alt = '整えた画像（長押しで保存）';
     box.appendChild(im);
   }
+  var prepared = null, prepTimer = null;
+  function schedulePrep() {
+    prepared = null; if (prepTimer) { clearTimeout(prepTimer); prepTimer = null; }
+    if (route !== 'share' || !state) return;
+    prepTimer = setTimeout(function () { prepTimer = null; try { prepared = currentFile(); } catch (e) { prepared = null; } }, 350);
+  }
   function currentFile() {
     var url;
     try { url = $('out').toDataURL('image/png'); } catch (e) { return null; }
@@ -528,13 +578,14 @@ var SF = (function () {
   }
   function save(viewOnly) {
     if (!state) return;
-    var f = currentFile();
+    var f = prepared || currentFile();
     if (!f) { saveMsg('画像を書き出せませんでした。比率か余白を小さくして、もう一度試してください。'); return; }
     if (viewOnly) { showLongPress('', f.blob); saveMsg('画像を表示しました。' + (ios ? '長押しで保存できます。' : '右クリックで保存できます。')); return; }
     if (route === 'share') {
       // 利用者の操作中に同期的に呼ぶ（toBlob など非同期処理をはさまない）
       if (f.file && nav.share && nav.canShare && nav.canShare({ files: [f.file] })) {
-        if (saving) return; saving = true;
+        if (saving) { saveMsg('共有メニューを開いています。閉じてから、もう一度押してください。'); return; }
+        saving = true; setTimeout(function () { saving = false; }, 30000);
         nav.share({ files: [f.file] }).then(function () { saving = false; saveMsg('共有メニューを閉じました。保存先を選べていれば保存されています。'); })
           .catch(function (e) { saving = false; if (e && e.name === 'AbortError') saveMsg('共有メニューを閉じました。保存はされていません。'); else showLongPress('共有メニューを開けませんでした。', f.blob); });
         return;

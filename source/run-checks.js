@@ -49,6 +49,9 @@ for (const r of ['1:1', '4:5', '16:9']) for (const [w, h] of [[1170, 2532], [256
   tr(b.x * 2 + b.dw === b.W && b.y * 2 + b.dh === b.H, `余白均等 ${r} ${w}x${h}`); tr(b.dw >= 1 && b.dh >= 1 && b.dw <= b.W && b.dh <= b.H, `領域内 ${r} ${w}x${h}`);
   tr(b.s <= 2.0000001 || b.dw <= 2, `拡大上限 ${r} ${w}x${h}`);
 }
+// 極端に細い画像でも余白0・半ピクセルにならない
+a = L(202, 10, { ratio: 'orig' }); tr(a.p >= 1, '細い画像 元の比率でも余白1px以上'); a = L(2191, 4); tr(Number.isInteger(a.x) && Number.isInteger(a.y) && a.x * 2 + a.dw === a.W && a.y * 2 + a.dh === a.H, '細い画像 位置が整数・余白均等 ' + J(a));
+a = L(4, 2191); tr(Number.isInteger(a.x) && Number.isInteger(a.y), '細い画像(縦) 位置が整数');
 // 背景・選択肢
 eq(X.BGS.length, 10, '背景は10種'); eq(X.BGS.filter(b => b.c.length === 1).length, 6, '単色6種'); eq(X.BGS.filter(b => b.c.length === 2).length, 4, 'グラデーション4種');
 eq(X.BGS.filter(b => b.c.length === 1).map(b => b.c[0]), ['#FFFFFF', '#F2F2F2', '#2A2A2A', '#111111', '#F5EFE6', '#E8EEF5'], '単色の値');
@@ -79,6 +82,15 @@ if (FIX) {
     's7-note.txt': 'text', 's7-doc.pdf': 'pdf', 's7-photo.heic': 'heic', 's7-anim.gif': 'gif', 's7-vector.svg': 'svg', 's7-corrupt.png': 'png', 's9-over20mb.png': 'png' };
   for (const k of Object.keys(K)) eq(X.sniff(head(k)), K[k], 'sniff ' + k);
   eq(X.classify('png'), 'ok', 'png は読める'); eq(X.classify('webp'), 'ok', 'webp'); eq(X.classify('heic'), 'unsupported', 'S7 HEIC は読めない形式'); eq(X.classify('gif'), 'unsupported', 'GIF'); eq(X.classify('text'), 'notimage', 'S7 txt は画像ではない'); eq(X.classify('pdf'), 'notimage', 'S7 pdf は画像ではない'); eq(X.classify('unknown'), 'notimage', '不明');
+}
+if (FIX) {
+  const full = name => new Uint8Array(fs.readFileSync(path.join(FIX, name)).subarray(0, 262144));
+  const SZ = [['s1-tall-1170x2532.png', 'png', 1170, 2532], ['s2-wide-2560x1440.jpg', 'jpeg', 2560, 1440], ['s6-orient6.jpg', 'jpeg', 400, 200], ['s12-webp-900x500.webp', 'webp', 900, 500], ['s5-huge-8000x6000.png', 'png', 8000, 6000], ['s13-claim-20000x20000.png', 'png', 20000, 20000], ['s14-bigexif-640x480.jpg', 'jpeg', 640, 480], ['s8-4000x3000.png', 'png', 4000, 3000]];
+  for (const [nm, k, w, h] of SZ) { const z = X.imageSize(full(nm), k); eq(z && [z.w, z.h], [w, h], 'imageSize ' + nm); }
+  tr(full('s13-claim-20000x20000.png').length < 200, 's13は小さなファイル（寸法の主張だけ）');
+  const z13 = X.imageSize(full('s13-claim-20000x20000.png'), 'png'); tr(z13.w * z13.h > X.MAX_PIXELS, 's13は上限(1億px)を超える');
+  tr(X.imageSize(full('s5-huge-8000x6000.png'), 'png').w * 6000 <= X.MAX_PIXELS, '8000x6000は上限内（4800万px）');
+  eq(X.imageSize(new Uint8Array(10), 'png'), null, 'imageSize 短すぎる');
 }
 eq(X.sniff(new Uint8Array([])), 'unknown', '空'); eq(X.sniff(new Uint8Array([0x42, 0x4D, 0x41, 0x42])), 'text', '"BMAB" は画像にしない（BMP判定を厳しく）');
 eq(X.sniff(new Uint8Array([0xEF, 0xBB, 0xBF, 0x3C, 0x73, 0x76, 0x67, 0x20, 0x78])), 'svg', 'BOM付きSVG');

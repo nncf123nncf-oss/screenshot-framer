@@ -53,6 +53,9 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleW
   ok(await ev('getComputedStyle(document.querySelector(".layout")).display') === 'grid', '880px以上は2カラム');
   ok(await ev('getComputedStyle(document.querySelector(".col-out")).position') === 'sticky', '右は sticky');
   ok(await ev('document.querySelectorAll(".notes li").length') === 3, '常設の注意は3行');
+  ok(await ev('getComputedStyle(document.querySelector(".notes a")).textIndent') === '0px', '注意②のリンクにぶら下げインデントが継承されない（文字が重ならない）');
+  ok(await ev('(()=>{const a=document.querySelector(".notes a");return a.target==="_blank"&&/noopener/.test(a.rel)})()'), '注意②のリンクは別タブ・noopener');
+  ok(await ev('(()=>{const a=document.querySelector(".notes a");const r=document.createRange();r.selectNodeContents(a);const t=r.getBoundingClientRect(),b=a.getBoundingClientRect();return t.left>=b.left-0.5})()'), '注意②のリンク文字が枠の外へはみ出さない');
   ok(!(await ev('document.getElementById("file").hasAttribute("accept")')), 'accept属性なし');
   ok(!(await vis('#opts')) && !(await vis('#srcSec')) && !(await vis('#resBox')) && await vis('#empty'), '画像を選ぶ前は選択肢・結果が出ない');
   ok(await ev('[...document.querySelectorAll(".chip[aria-pressed=true]")].map(c=>c.dataset.key+":"+c.dataset.id).join(",")') === 'ratio:1:1,pad:m,bg:lgray,radius:s,shadow:on', '選択肢の初期値');
@@ -139,7 +142,7 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleW
   ok((await txt('#outInfo')).includes('2倍まで'), 'S6 拡大の上限の表示');
 
   // ---------- S7 画像でないファイルなど ----------
-  const bad = [['s7-note.txt', '画像ファイルを選んでください'], ['s7-doc.pdf', '画像ファイルを選んでください'], ['s7-photo.heic', 'この形式（HEIC）は読めません'], ['s7-anim.gif', 'この形式（GIF）は読めません'], ['s7-vector.svg', 'この形式（SVG）は読めません'], ['s7-corrupt.png', '読み込めませんでした'], ['s9-over20mb.png', '20MBまで']];
+  const bad = [['s7-note.txt', '画像ファイルを選んでください'], ['s7-doc.pdf', '画像ファイルを選んでください'], ['s7-photo.heic', 'この形式（HEIC）は読めません'], ['s7-anim.gif', 'この形式（GIF）は読めません'], ['s7-vector.svg', 'この形式（SVG）は読めません'], ['s7-corrupt.png', '読み込めませんでした'], ['s9-over20mb.png', '20MBまで'], ['s13-claim-20000x20000.png', '大きすぎて読み込めませんでした（20000×20000 px）']];
   for (const [f, msg] of bad) {
     await pick(fx(f)); const s = await txt('#status');
     ok(s.includes(msg), `S7 ${f}: ${s}`); ok(await ev('document.getElementById("status").classList.contains("err")'), `S7 ${f}: エラー表示`);
@@ -212,6 +215,7 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleW
   await click('#saveBtn'); await sleep(300);
   let sh = await ev('window.__share'); ok(sh && sh.n === 1 && /^framed-1x1-\d{8}-\d{6}\.png$/.test(sh.name) && sh.type === 'image/png' && sh.size > 1000, 'iPhone: 共有シートにPNGのFileを渡す ' + JSON.stringify(sh));
   ok((await ev('window.__dl')).length === 0, 'iPhone: 通常のダウンロードは使わない'); ok((await txt('#saveMsg')).includes('共有メニューを閉じました'), 'iPhone: 共有後の案内');
+  await ev(`Object.defineProperty(navigator,'share',{value:(d)=>{window.__share={n:d.files.length,name:d.files[0].name,type:d.files[0].type,size:d.files[0].size};return Promise.resolve()},configurable:true});`);
   await ev(`Object.defineProperty(navigator,'share',{value:()=>Promise.reject(Object.assign(new Error('x'),{name:'AbortError'})),configurable:true})`);
   await click('#saveBtn'); await sleep(300); ok((await txt('#saveMsg')).includes('保存はされていません') && (await ev('document.querySelectorAll("#lp img").length')) === 0, 'iPhone: キャンセルは長押し表示にしない');
   await ev(`Object.defineProperty(navigator,'share',{value:()=>Promise.reject(Object.assign(new Error('x'),{name:'NotAllowedError'})),configurable:true})`);
@@ -222,6 +226,12 @@ const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleW
   await click('#viewBtn'); await sleep(200); ok((await ev('document.querySelectorAll("#lp img").length')) === 1, '画像を表示ボタンで長押し表示');
   const lpOk = await ev(`(async()=>{const im=document.querySelector('#lp img');await new Promise(r=>{if(im.complete)r();else im.onload=r});return [im.naturalWidth,im.naturalHeight]})()`); ok(lpOk[0] === 1080 && lpOk[1] === 1080, '長押し用の画像は出力と同じ寸法 ' + lpOk);
   await click('.chip[data-key=ratio][data-id="4:5"]'); ok((await ev('document.getElementById("lp").children.length')) === 0, '設定を変えると長押し表示は消える');
+  // 設定を変えて少し待つと、保存のPNGは先に作られている（押した操作の中で重い処理をしない）。押した直後にも共有シートが呼ばれる
+  await ev(`Object.defineProperty(navigator,'canShare',{value:(d)=>!!(d&&d.files&&d.files.length),configurable:true});window.__share=null;Object.defineProperty(navigator,'share',{value:(d)=>{window.__share={name:d.files[0].name,size:d.files[0].size};return new Promise(()=>{})},configurable:true});`);
+  await click('.chip[data-key=bg][data-id=mori]'); await sleep(900);
+  await click('#saveBtn'); sh = await ev('window.__share'); ok(sh && sh.size > 1000, 'iPhone: 先に作ったPNGで、押した直後に共有シートを呼ぶ ' + JSON.stringify(sh));
+  await ev('window.__share=null'); await click('#saveBtn'); await sleep(200);
+  ok((await ev('window.__share')) === null && (await txt('#saveMsg')).includes('共有メニューを開いています'), 'iPhone: 共有メニューが開いている間に押しても二重に呼ばず、案内を出す');
   await send('Emulation.setUserAgentOverride', { userAgent: '' });
   await send('Emulation.setTouchEmulationEnabled', { enabled: false });
 
